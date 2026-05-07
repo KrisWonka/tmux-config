@@ -34,9 +34,12 @@ echo "==> 安装 / 更新插件..."
 "$TPM_DIR/bin/install_plugins" >/dev/null 2>&1 || true
 "$TPM_DIR/bin/update_plugins" all >/dev/null 2>&1 || true
 
+# 如果已有运行中的 tmux server，自动 reload 配置（让所有现有 session 立即生效）
+if tmux ls >/dev/null 2>&1; then
+  echo "==> 检测到运行中的 tmux server，自动 reload 配置..."
+  tmux source-file "$TARGET"
+  echo "    所有现有 session 已生效新配置"
+fi
+
 echo ""
-echo "✅ 完成！"
-echo ""
-echo "下一步:"
-echo "  - 如果当前已在 tmux 中，按 Ctrl+a 然后 r 重载配置"
-echo "  - 否则直接 tmux 启动即可"
+echo "✅ 完成！直接进 tmux 就能用新配置了"
