@@ -16,7 +16,58 @@ curl -fsSL https://raw.githubusercontent.com/KrisWonka/tmux-config/main/install.
 3. 安装 [tpm](https://github.com/tmux-plugins/tpm) 插件管理器（如未安装）
 4. 自动安装所有插件
 
-安装完成后，进入 tmux 按 `Ctrl+a` 然后 `r` 重载配置即可。
+安装脚本会在检测到运行中的 tmux server 时自动 reload 配置；如果没在跑，下次 `tmux` 启动就直接用新配置。
+
+## 常用命令（在 shell 中执行）
+
+### 启动 / 进入 session
+
+| 命令 | 功能 |
+|---|---|
+| `tmux` | 启动一个新的 tmux session（默认名 `0`、`1`...） |
+| `tmux new -s <name>` | 启动一个具名 session，例如 `tmux new -s dev` |
+| `tmux a` 或 `tmux attach` | 重新连接到上一个 session |
+| `tmux a -t <name>` | 连接到指定 session，例如 `tmux a -t dev` |
+| `tmux a -d -t <name>` | 连接并把其它已连接的客户端踢下线（适合从另一台机器抢回） |
+
+### 查看 / 管理 session
+
+| 命令 | 功能 |
+|---|---|
+| `tmux ls` | 列出所有运行中的 session |
+| `tmux rename-session -t <old> <new>` | 重命名 session |
+| `tmux kill-session -t <name>` | 关闭指定 session |
+| `tmux kill-server` | 关闭整个 tmux server（**所有 session 一起没**） |
+
+### 配置 / 调试
+
+| 命令 | 功能 |
+|---|---|
+| `tmux source-file ~/.tmux.conf` | 让正在运行的 tmux server 重新加载配置（不需要重启） |
+| `tmux show -g prefix` | 查看当前生效的前缀键（验证配置是否生效） |
+| `tmux list-keys` | 列出所有快捷键绑定（信息量大，建议管道接 `less`） |
+
+### Session 持久化（resurrect 插件）
+
+| 命令 | 功能 |
+|---|---|
+| `<prefix>` + `Ctrl+s` | 在 tmux 内手动保存所有 session 状态 |
+| `<prefix>` + `Ctrl+r` | 在 tmux 内手动恢复上次保存的 session |
+
+> 配置中已开启 `tmux-continuum` 自动每 15 分钟保存，并在 tmux 启动时自动恢复，通常无需手动操作。
+
+### 典型工作流
+
+```bash
+# 第一次进入远程机器
+tmux new -s work          # 启动名为 work 的 session
+
+# 中途断开 ssh / 关闭终端 —— session 仍在后台运行
+
+# 重新连上来
+ssh remote
+tmux a -t work            # 回到原来的 session，所有进程还活着
+```
 
 ## 前缀键
 
